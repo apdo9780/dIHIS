@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}Receptionist AI - I-HIS{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Header -->
+            <div class="mb-5">
+                <h1 class="fw-bold mb-2">
+                    <i class="bi bi-robot"></i> Hospital Receptionist AI
+                </h1>
+                <p class="text-muted lead">
+                    Intelligent patient registration, triage, and department routing system
+                </p>
+            </div>
+
+            <!-- Main Interface -->
+            <div class="row g-4">
+                <!-- Left Column: Input Interface -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-lg h-100">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0 fw-bold">Patient Registration & Triage</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form id="triageForm">
+                                <div class="mb-3">
+                                    <label for="firstName" class="form-label fw-bold">First Name</label>
+                                    <input type="text" class="form-control form-control-lg" id="firstName" placeholder="Patient first name" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="lastName" class="form-label fw-bold">Last Name</label>
+                                    <input type="text" class="form-control form-control-lg" id="lastName" placeholder="Patient last name" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label fw-bold">Phone Number</label>
+                                    <input type="tel" class="form-control form-control-lg" id="phone" placeholder="(555) 123-4567" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="chiefComplaint" class="form-label fw-bold">Chief Complaint</label>
+                                    <input type="text" class="form-control form-control-lg" id="chiefComplaint" placeholder="Main reason for visit" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="symptoms" class="form-label fw-bold">Symptoms</label>
+                                    <textarea class="form-control form-control-lg" id="symptoms" rows="3" placeholder="Describe symptoms in detail..."></textarea>
+                                </div>
+
+                                <button type="button" class="btn btn-success btn-lg w-100 fw-bold" id="triageBtn">
+                                    <i class="bi bi-play-circle"></i> Run Triage Assessment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Results Display -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-lg h-100">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0 fw-bold">Assessment Results</h5>
+                        </div>
+                        <div class="card-body p-4" id="resultsContainer">
+                            <div class="alert alert-secondary" role="alert">
+                                <i class="bi bi-info-circle"></i> Fill out the form and click "Run Triage Assessment" to see results here.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Available Departments -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light border-bottom">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="bi bi-hospital"></i> Available Departments
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row" id="departmentsContainer">
+                                <!-- Departments will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How It Works -->
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm bg-light">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-3">
+                                <i class="bi bi-question-circle"></i> How the Receptionist AI Works
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="d-flex">
+                                        <div class="badge bg-primary me-3" style="height: fit-content;">1</div>
+                                        <div>
+                                            <p class="fw-bold mb-1">Collect Information</p>
+                                            <p class="small text-muted mb-0">Gather patient demographics and chief complaint</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="d-flex">
+                                        <div class="badge bg-primary me-3" style="height: fit-content;">2</div>
+                                        <div>
+                                            <p class="fw-bold mb-1">Assess Severity</p>
+                                            <p class="small text-muted mb-0">Determine triage level (Critical/Urgent/Moderate/Mild)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="d-flex">
+                                        <div class="badge bg-primary me-3" style="height: fit-content;">3</div>
+                                        <div>
+                                            <p class="fw-bold mb-1">Route to Department</p>
+                                            <p class="small text-muted mb-0">Recommend appropriate healthcare department</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="d-flex">
+                                        <div class="badge bg-primary me-3" style="height: fit-content;">4</div>
+                                        <div>
+                                            <p class="fw-bold mb-1">Schedule Appointment</p>
+                                            <p class="small text-muted mb-0">Book appointment and provide guidance</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load departments on page load
+    loadDepartments();
+
+    // Add event listener to triage button
+    document.getElementById('triageBtn').addEventListener('click', function() {
+        assessTriage();
+    });
+});
+
+function loadDepartments() {
+    // Mock departments data - in production this would come from the server
+    const departments = [
+        { name: 'General Medicine', available: true, wait: '15 mins' },
+        { name: 'Cardiology', available: true, wait: '30 mins' },
+        { name: 'Neurology', available: true, wait: '25 mins' },
+        { name: 'Pulmonology', available: false, wait: 'Closed' },
+        { name: 'Gastroenterology', available: true, wait: '20 mins' },
+        { name: 'Orthopedics', available: true, wait: '30 mins' },
+    ];
+
+    const container = document.getElementById('departmentsContainer');
+    container.innerHTML = '';
+
+    departments.forEach(dept => {
+        const deptBadgeColor = dept.available ? 'success' : 'danger';
+        const deptStatus = dept.available ? 'Open' : 'Closed';
+        const html = `
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 bg-white">
+                    <div class="card-body">
+                        <p class="mb-2">
+                            <strong>${dept.name}</strong>
+                            <span class="badge bg-${deptBadgeColor} float-end">${deptStatus}</span>
+                        </p>
+                        <p class="small text-muted mb-0">
+                            Estimated wait: <strong>${dept.wait}</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML += html;
+    });
+}
+
+function assessTriage() {
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const phone = document.getElementById('phone').value;
+    const chiefComplaint = document.getElementById('chiefComplaint').value;
+    const symptoms = document.getElementById('symptoms').value;
+
+    if (!firstName || !lastName || !phone || !chiefComplaint) {
+        alert('Please fill out all required fields.');
+        return;
+    }
+
+    // Show loading state
+    const resultsContainer = document.getElementById('resultsContainer');
+    resultsContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+    // Simulate AI processing (in production, this would call the API)
+    setTimeout(() => {
+        const result = generateMockTriageResult(chiefComplaint, symptoms);
+        displayTriageResult(result);
+    }, 1000);
+}
+
+function generateMockTriageResult(chiefComplaint, symptoms) {
+    const complaintLower = chiefComplaint.toLowerCase();
+    let priority = 'moderate';
+    let department = 'General Medicine';
+
+    // Simple rule-based triage
+    if (complaintLower.includes('chest') || complaintLower.includes('heart')) {
+        priority = 'urgent';
+        department = 'Cardiology';
+    } else if (complaintLower.includes('head') || complaintLower.includes('dizzy')) {
+        priority = 'moderate';
+        department = 'Neurology';
+    } else if (complaintLower.includes('cough') || complaintLower.includes('breathing')) {
+        priority = 'urgent';
+        department = 'Pulmonology';
+    } else if (complaintLower.includes('stomach') || complaintLower.includes('abdom')) {
+        priority = 'moderate';
+        department = 'Gastroenterology';
+    } else if (complaintLower.includes('joint') || complaintLower.includes('pain')) {
+        priority = 'mild';
+        department = 'Orthopedics';
+    }
+
+    return {
+        priority: priority,
+        department: department,
+        guidance: `Patient should be directed to ${department} department.`,
+        estimatedWait: priority === 'urgent' ? '5-10 mins' : priority === 'moderate' ? '30-60 mins' : '1-2 hours'
+    };
+}
+
+function displayTriageResult(result) {
+    const priorityColors = {
+        'critical': 'danger',
+        'urgent': 'warning',
+        'moderate': 'info',
+        'mild': 'success'
+    };
+
+    const resultsContainer = document.getElementById('resultsContainer');
+    const html = `
+        <div class="alert alert-${priorityColors[result.priority] || 'info'} mb-3">
+            <h5 class="mb-2"><i class="bi bi-exclamation-triangle"></i> Triage Priority</h5>
+            <p class="mb-0">
+                <span class="badge bg-${priorityColors[result.priority] || 'info'}">${result.priority.toUpperCase()}</span>
+            </p>
+        </div>
+
+        <div class="card border-0 mb-3">
+            <div class="card-body">
+                <p class="mb-1"><strong>Recommended Department:</strong></p>
+                <p class="mb-0"><span class="badge bg-primary">${result.department}</span></p>
+            </div>
+        </div>
+
+        <div class="card border-0 mb-3">
+            <div class="card-body">
+                <p class="mb-1"><strong>Guidance:</strong></p>
+                <p class="mb-0">${result.guidance}</p>
+            </div>
+        </div>
+
+        <div class="card border-0">
+            <div class="card-body">
+                <p class="mb-1"><strong>Estimated Wait Time:</strong></p>
+                <p class="mb-0">${result.estimatedWait}</p>
+            </div>
+        </div>
+    `;
+
+    resultsContainer.innerHTML = html;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Search Patients - I-HIS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Search Card -->
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-search"></i> Patient Search
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        <div class="input-group input-group-lg">
+                            {{ form.search_query(class="form-control") }}
+                            {{ form.submit(class="btn btn-primary fw-bold") }}
+                        </div>
+                        {% if form.search_query.errors %}
+                            <div class="text-danger small mt-2">
+                                {% for error in form.search_query.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <!-- Results -->
+            {% if results %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light border-bottom">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-list-check"></i> 
+                        Search Results ({{ results|length }} found)
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>MRN</th>
+                                    <th>Age</th>
+                                    <th>Contact</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for patient in results %}
+                                <tr>
+                                    <td class="fw-bold">{{ patient.full_name }}</td>
+                                    <td>{{ patient.mrn }}</td>
+                                    <td>{{ patient.age }}</td>
+                                    <td class="small">{{ patient.phone }}</td>
+                                    <td>
+                                        <span class="badge bg-success">{{ patient.status|capitalize }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('patient.view_patient', patient_id=patient.id) }}" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Link to Register -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-lg-8 text-center">
+            <p class="text-muted">
+                Patient not found? <a href="{{ url_for('patient.register') }}">Register a new patient</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

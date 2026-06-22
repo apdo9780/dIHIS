@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Home - I-HIS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Hero Section -->
+    <div class="row bg-light py-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4 fw-bold mb-4">
+                <i class="bi bi-hospital text-primary"></i>
+                Intelligent Hospital Information System
+            </h1>
+            <p class="lead text-muted mb-4">
+                A comprehensive AI-powered healthcare management platform designed to streamline patient care,
+                enhance clinical decision-making, and integrate intelligent medical specialists.
+            </p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('patient.register') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                    <i class="bi bi-person-plus"></i> Register Patient
+                </a>
+                <a href="{{ url_for('receptionist.interface') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-robot"></i> AI Receptionist
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row py-5">
+        <div class="col-lg-10 mx-auto">
+            <h2 class="text-center mb-5 fw-bold">Key Features</h2>
+            
+            <div class="row g-4">
+                <!-- Feature 1: Patient Management -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-primary rounded-circle mx-auto mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-person-vcard text-white" style="font-size: 2rem; line-height: 60px;"></i>
+                            </div>
+                            <h5 class="card-title">Patient Management</h5>
+                            <p class="card-text text-muted">
+                                Comprehensive patient registration and Electronic Patient Record (EPR) management.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2: AI Receptionist -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-success rounded-circle mx-auto mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-robot text-white" style="font-size: 2rem; line-height: 60px;"></i>
+                            </div>
+                            <h5 class="card-title">AI Receptionist</h5>
+                            <p class="card-text text-muted">
+                                Intelligent patient registration, triage, and department routing.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3: Clinical Dashboard -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-info rounded-circle mx-auto mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-speedometer2 text-white" style="font-size: 2rem; line-height: 60px;"></i>
+                            </div>
+                            <h5 class="card-title">Clinical Dashboard</h5>
+                            <p class="card-text text-muted">
+                                Real-time patient monitoring and clinical decision support.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 4: Appointment Scheduling -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-warning rounded-circle mx-auto mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-calendar-check text-white" style="font-size: 2rem; line-height: 60px;"></i>
+                            </div>
+                            <h5 class="card-title">Appointment Scheduling</h5>
+                            <p class="card-text text-muted">
+                                Streamlined appointment booking and management system.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 5: Data Security -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-danger rounded-circle mx-auto mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-shield-lock text-white" style="font-size: 2rem; line-height: 60px;"></i>
+                            </div>
+                            <h5 class="card-title">Data Security</h5>
+                            <p class="card-text text-muted">
+                                Secure patient records with comprehensive data protection.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 6: Integration Ready -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm hover-card">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-secondary rounded-circle mx-auto mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-puzzle text-white" style="font-size: 2rem; line-height: 60px;"></i>
+                            </div>
+                            <h5 class="card-title">Integration Ready</h5>
+                            <p class="card-text text-muted">
+                                Modular architecture ready for future AI specialist integration.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="row bg-primary text-white py-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h3 class="mb-4">Ready to Get Started?</h3>
+            <p class="lead mb-4">
+                Register your first patient and experience the power of AI-assisted healthcare management.
+            </p>
+            <a href="{{ url_for('patient.register') }}" class="btn btn-light btn-lg px-5">
+                Register Your First Patient
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+{% endblock %}

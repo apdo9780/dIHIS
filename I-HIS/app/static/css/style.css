@@ -1,0 +1,229 @@
+/* I-HIS Application Styles */
+
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main.main-content {
+    flex: 1;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-size: 1.5rem;
+    letter-spacing: 0.05rem;
+}
+
+.navbar-nav .nav-link {
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: rgba(255, 255, 255, 0.8) !important;
+    transform: translateY(-2px);
+}
+
+/* Cards */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Forms */
+.form-control,
+.form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-label {
+    color: #495057;
+    margin-bottom: 0.75rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Badges */
+.badge {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Tables */
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    border-top: none;
+    border-bottom: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+    background-color: #212529;
+    color: #ffffff;
+}
+
+/* Feature Cards */
+.feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .navbar-nav {
+        margin-top: 1rem;
+    }
+
+    .navbar-nav .nav-link {
+        margin-left: 0;
+        padding: 0.5rem 0;
+    }
+
+    .display-4 {
+        font-size: 2rem;
+    }
+
+    .lead {
+        font-size: 1.1rem;
+    }
+}
+
+/* Utility Classes */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.bg-light-primary {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-color) !important;
+}
+
+.hover-card {
+    cursor: pointer;
+}
+
+/* Spinner Animation */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    footer,
+    .btn,
+    form {
+        display: none;
+    }
+
+    body {
+        background-color: white;
+    }
+
+    .card {
+        page-break-inside: avoid;
+    }
+}
