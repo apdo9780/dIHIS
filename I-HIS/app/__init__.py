@@ -30,10 +30,12 @@ def create_app(config_name='development'):
     from app.routes.main import main_bp
     from app.routes.patient import patient_bp
     from app.routes.receptionist_ai import receptionist_bp
+    from app.routes.icu_ai import icu_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(patient_bp)
     app.register_blueprint(receptionist_bp)
+    app.register_blueprint(icu_bp)
     
     # Create database tables
     with app.app_context():

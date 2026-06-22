@@ -78,6 +78,24 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1 small">ICU Critical Alerts</p>
+                            <h3 class="fw-bold mb-0">
+                                <a href="{{ url_for('icu.dashboard') }}" class="text-danger text-decoration-none" id="icu-alerts">0</a>
+                            </h3>
+                        </div>
+                        <div class="bg-danger rounded-circle p-3" style="width: 50px; height: 50px;">
+                            <i class="bi bi-activity text-white" style="font-size: 1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Recent Activity Section -->
@@ -105,8 +123,8 @@
                             </a>
                         </div>
                         <div class="col-md-6">
-                            <a href="#" class="btn btn-outline-warning w-100">
-                                <i class="bi bi-calendar-check"></i> Schedule Appointment
+                            <a href="{{ url_for('icu.dashboard') }}" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-activity"></i> ICU Monitoring
                             </a>
                         </div>
                     </div>
@@ -131,10 +149,83 @@
                     </p>
                     <ul class="small mt-2">
                         <li><span class="badge bg-info">Receptionist AI</span></li>
+                        <li><span class="badge bg-danger">ICU CDSS</span></li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- ICU Monitoring Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-activity"></i> ICU Clinical Decision Support System</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-lg-3">
+                            <div class="text-center">
+                                <h6 class="text-muted mb-2">Critical Alerts</h6>
+                                <h3 class="fw-bold text-danger" id="icu-critical-count">0</h3>
+                                <p class="small text-muted mb-0">Require immediate attention</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="text-center">
+                                <h6 class="text-muted mb-2">Warning Alerts</h6>
+                                <h3 class="fw-bold text-warning" id="icu-warning-count">0</h3>
+                                <p class="small text-muted mb-0">Monitoring recommended</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="text-center">
+                                <h6 class="text-muted mb-2">Patients Monitored</h6>
+                                <h3 class="fw-bold text-info" id="icu-patients-count">0</h3>
+                                <p class="small text-muted mb-0">Active in system</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="text-center">
+                                <h6 class="text-muted mb-2">Last Updated</h6>
+                                <p class="fw-bold mb-0" id="icu-last-update">--</p>
+                                <a href="{{ url_for('icu.dashboard') }}" class="btn btn-sm btn-danger mt-2">
+                                    <i class="bi bi-arrow-right"></i> View Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    // Fetch ICU stats every 10 seconds
+    function updateICUStats() {
+        fetch('/icu/api/dashboard-data')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('icu-alerts').textContent = data.summary.critical_alerts;
+                    document.getElementById('icu-critical-count').textContent = data.summary.critical_alerts;
+                    document.getElementById('icu-warning-count').textContent = data.summary.warning_alerts;
+                    document.getElementById('icu-patients-count').textContent = data.summary.patients_monitored;
+                    
+                    const now = new Date();
+                    document.getElementById('icu-last-update').textContent = now.toLocaleTimeString();
+                }
+            })
+            .catch(err => console.log('ICU stats update skipped (system starting)'));
+    }
+    
+    // Initial update
+    setTimeout(updateICUStats, 1000);
+    
+    // Update every 10 seconds
+    setInterval(updateICUStats, 10000);
+</script>
 {% endblock %}
+

@@ -1,0 +1,533 @@
+{% extends "base.html" %}
+
+{% block title %}ICU Monitoring Dashboard - CDSS{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-dark mb-2">
+                <i class="fas fa-heart-pulse text-danger"></i> ICU Monitoring Dashboard
+            </h1>
+            <p class="text-muted">Clinical Decision Support System - Real-time Vital Signs Monitoring</p>
+            
+            <!-- Last Updated Timestamp -->
+            <small class="text-muted d-block mt-2">
+                <i class="fas fa-clock"></i> Last Updated: <span id="lastUpdated">just now</span>
+            </small>
+        </div>
+    </div>
+
+    {% if error %}
+    <!-- Error Alert -->
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Dashboard Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-danger text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white-50 mb-0">Critical Alerts</h6>
+                            <h2 class="mb-0" id="criticalCount">{{ critical_count }}</h2>
+                        </div>
+                        <div class="text-white-50">
+                            <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning text-dark shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-dark-50 mb-0">Total Alerts</h6>
+                            <h2 class="mb-0" id="totalAlerts">{{ alert_count }}</h2>
+                        </div>
+                        <div class="text-dark-50">
+                            <i class="fas fa-bell fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white-50 mb-0">Patients Monitored</h6>
+                            <h2 class="mb-0" id="patientsCount">{{ patient_vitals|length }}</h2>
+                        </div>
+                        <div class="text-white-50">
+                            <i class="fas fa-users fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-white-50 mb-0">System Status</h6>
+                            <h2 class="mb-0"><i class="fas fa-circle text-success"></i></h2>
+                        </div>
+                        <div class="text-white-50">
+                            <i class="fas fa-check-circle fa-3x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Critical Alerts Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-left-danger">
+                <div class="card-header bg-danger text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-circle"></i> Critical Clinical Alerts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if critical_alerts %}
+                        <div id="criticalAlertsContainer">
+                            {% for alert in critical_alerts %}
+                            <div class="alert alert-danger alert-dismissible fade show mb-3 critical-alert" 
+                                 data-alert-id="{{ alert.id }}" role="alert">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="alert-heading mb-2">
+                                            <i class="fas fa-siren text-danger"></i> {{ alert.message }}
+                                        </h5>
+                                        <p class="mb-2 text-dark">
+                                            <strong>Recommended Intervention:</strong><br>
+                                            {{ alert.recommended_intervention }}
+                                        </p>
+                                        <small class="text-muted">
+                                            <i class="fas fa-user"></i> Patient: 
+                                            <a href="/patient/{{ alert.patient.id }}" class="text-decoration-none">
+                                                {{ alert.patient.first_name }} {{ alert.patient.last_name }} ({{ alert.patient.mrn }})
+                                            </a>
+                                        </small>
+                                        <br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock"></i> {{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                        </small>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button class="btn btn-outline-danger btn-sm acknowledge-btn" 
+                                                data-alert-id="{{ alert.id }}">
+                                            <i class="fas fa-check"></i> Acknowledge Alert
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success mb-0">
+                            <i class="fas fa-check-circle"></i> <strong>No Critical Alerts</strong> - All monitored patients are stable.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Alerts Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-left-warning">
+                <div class="card-header bg-warning text-dark py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bell"></i> Warning Alerts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% set warning_alerts = unacknowledged_alerts|selectattr('alert_level', 'equalto', 'Warning')|list %}
+                    {% if warning_alerts %}
+                        <div id="warningAlertsContainer">
+                            {% for alert in warning_alerts %}
+                            <div class="alert alert-warning alert-dismissible fade show mb-3 warning-alert" 
+                                 data-alert-id="{{ alert.id }}" role="alert">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6 class="alert-heading mb-1">
+                                            <i class="fas fa-exclamation-triangle text-warning"></i> {{ alert.message }}
+                                        </h6>
+                                        <p class="mb-2 text-dark">
+                                            {{ alert.recommended_intervention }}
+                                        </p>
+                                        <small class="text-muted">
+                                            <i class="fas fa-user"></i> 
+                                            <a href="/patient/{{ alert.patient.id }}" class="text-decoration-none">
+                                                {{ alert.patient.first_name }} {{ alert.patient.last_name }} ({{ alert.patient.mrn }})
+                                            </a>
+                                        </small>
+                                        <br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock"></i> {{ alert.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                        </small>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <button class="btn btn-outline-warning btn-sm acknowledge-btn" 
+                                                data-alert-id="{{ alert.id }}">
+                                            <i class="fas fa-check"></i> Acknowledge
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-muted text-center py-4">
+                            <i class="fas fa-check-circle fa-2x text-success opacity-50"></i>
+                            <p class="mt-2">No warning alerts at this time.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Vitals Monitor Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-heartbeat"></i> Patient Vitals Monitor
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if patient_vitals %}
+                        <div id="vitalsContainer" class="row">
+                            {% for item in patient_vitals %}
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="card h-100 shadow-sm hover-shadow vital-card" 
+                                     data-patient-id="{{ item.patient.id }}">
+                                    <div class="card-header bg-light border-bottom">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0 text-dark fw-bold">
+                                                    {{ item.patient.first_name }} {{ item.patient.last_name }}
+                                                </h6>
+                                                <small class="text-muted">{{ item.patient.mrn }}</small>
+                                            </div>
+                                            <a href="/patient/{{ item.patient.id }}" class="btn btn-sm btn-outline-primary" 
+                                               title="View Patient Record">
+                                                <i class="fas fa-external-link-alt"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Heart Rate -->
+                                        <div class="vital-item mb-3 pb-3 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="text-muted">Heart Rate</span>
+                                                <span class="badge bg-info">
+                                                    <i class="fas fa-heart"></i> {{ item.vital.heart_rate }} BPM
+                                                </span>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">Normal: 60-100 BPM</small>
+                                        </div>
+
+                                        <!-- Blood Pressure -->
+                                        <div class="vital-item mb-3 pb-3 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="text-muted">Blood Pressure</span>
+                                                <span class="badge bg-info">
+                                                    {{ item.vital.blood_pressure_systolic }}/{{ item.vital.blood_pressure_diastolic }}
+                                                </span>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">Normal: 90-140 / 60-90 mmHg</small>
+                                        </div>
+
+                                        <!-- Oxygen Saturation -->
+                                        <div class="vital-item mb-3 pb-3 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="text-muted">SpO<sub>2</sub></span>
+                                                <span class="badge {% if item.vital.oxygen_saturation >= 95 %}bg-success{% elif item.vital.oxygen_saturation >= 92 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                    {{ "%.1f"|format(item.vital.oxygen_saturation) }}%
+                                                </span>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">Normal: ≥95%</small>
+                                        </div>
+
+                                        <!-- Temperature -->
+                                        <div class="vital-item mb-3 pb-3 border-bottom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="text-muted">Temperature</span>
+                                                <span class="badge {% if item.vital.temperature >= 36.5 and item.vital.temperature <= 37.5 %}bg-success{% else %}bg-warning{% endif %}">
+                                                    {{ "%.1f"|format(item.vital.temperature) }} °C
+                                                </span>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">Normal: 36.5-37.5 °C</small>
+                                        </div>
+
+                                        <!-- Respiratory Rate -->
+                                        <div class="vital-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="text-muted">Respiratory Rate</span>
+                                                <span class="badge bg-info">
+                                                    {{ item.vital.respiratory_rate }} /min
+                                                </span>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">Normal: 12-20 breaths/min</small>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-light text-muted small">
+                                        <i class="fas fa-history"></i> 
+                                        Last recorded: {{ item.vital.recorded_at.strftime('%H:%M:%S') }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-inbox fa-3x opacity-25 mb-3"></i>
+                            <p>No patient vital signs recorded yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Information Panel -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow-sm border-info">
+                <div class="card-header bg-info text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle"></i> System Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Real-time Monitoring:</strong> This dashboard updates automatically every 5 seconds to display 
+                        the latest clinical alerts and vital signs.
+                    </p>
+                    <p class="mb-2">
+                        <strong>Alert Severity Levels:</strong>
+                        <span class="badge bg-danger ms-2">Critical</span> - Requires immediate intervention
+                        <span class="badge bg-warning text-dark ms-2">Warning</span> - Requires monitoring
+                    </p>
+                    <p class="mb-0">
+                        <strong>API Access:</strong> Vital signs can be submitted via POST to <code>/icu/api/vitals</code>. 
+                        See documentation for detailed payload format.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles for ICU Dashboard -->
+<style>
+    .border-left-danger {
+        border-left: 4px solid #dc3545 !important;
+    }
+
+    .border-left-warning {
+        border-left: 4px solid #ffc107 !important;
+    }
+
+    .hover-shadow {
+        transition: box-shadow 0.3s ease;
+    }
+
+    .hover-shadow:hover {
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+    }
+
+    .vital-item {
+        padding: 0.5rem 0;
+    }
+
+    .critical-alert {
+        border-left: 5px solid #dc3545;
+    }
+
+    .warning-alert {
+        border-left: 5px solid #ffc107;
+    }
+
+    .acknowledge-btn {
+        white-space: nowrap;
+    }
+
+    #lastUpdated {
+        font-weight: 600;
+        color: #0d6efd;
+    }
+</style>
+
+<!-- JavaScript for Real-time Polling and Interactions -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuration
+    const POLL_INTERVAL = 5000; // 5 seconds
+    const API_BASE = '/icu/api';
+
+    // Initialize dashboard
+    initializeDashboard();
+
+    // Set up polling
+    setInterval(updateDashboard, POLL_INTERVAL);
+
+    /**
+     * Initialize dashboard event listeners
+     */
+    function initializeDashboard() {
+        // Add event listeners to acknowledge buttons
+        document.querySelectorAll('.acknowledge-btn').forEach(btn => {
+            btn.addEventListener('click', handleAcknowledgeAlert);
+        });
+
+        // Add visual indicators for abnormal vitals
+        updateVitalIndicators();
+    }
+
+    /**
+     * Update dashboard data from API
+     */
+    function updateDashboard() {
+        fetch(`${API_BASE}/dashboard-data`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateAlertCounts(data.summary);
+                    updateAlerts(data);
+                    updateTimestamp();
+                }
+            })
+            .catch(error => console.error('Dashboard update error:', error));
+    }
+
+    /**
+     * Update alert count badges
+     */
+    function updateAlertCounts(summary) {
+        document.getElementById('criticalCount').textContent = summary.critical_alerts;
+        document.getElementById('totalAlerts').textContent = summary.total_alerts;
+        document.getElementById('patientsCount').textContent = summary.patients_monitored;
+    }
+
+    /**
+     * Update alerts display
+     */
+    function updateAlerts(data) {
+        const criticalContainer = document.getElementById('criticalAlertsContainer');
+        const warningContainer = document.getElementById('warningAlertsContainer');
+
+        if (criticalContainer && data.critical_alerts.length > 0) {
+            // New critical alerts can be added dynamically here
+            // For now, page refresh will show new alerts
+        }
+
+        if (warningContainer && data.warning_alerts.length > 0) {
+            // New warning alerts can be added dynamically here
+            // For now, page refresh will show new alerts
+        }
+    }
+
+    /**
+     * Handle alert acknowledgment
+     */
+    function handleAcknowledgeAlert(event) {
+        event.preventDefault();
+        const alertId = this.dataset.alertId;
+        const alertElement = document.querySelector(`[data-alert-id="${alertId}"]`);
+
+        fetch(`${API_BASE}/alerts/${alertId}/acknowledge`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                acknowledged_by: 'Clinician'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove alert from display with animation
+                alertElement.style.opacity = '0.5';
+                alertElement.style.textDecoration = 'line-through';
+                
+                setTimeout(() => {
+                    alertElement.remove();
+                    updateDashboard(); // Refresh counts
+                }, 1000);
+
+                // Show success notification
+                showNotification('Alert acknowledged successfully', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error acknowledging alert:', error);
+            showNotification('Error acknowledging alert', 'danger');
+        });
+    }
+
+    /**
+     * Update vital sign visual indicators
+     */
+    function updateVitalIndicators() {
+        document.querySelectorAll('.vital-card').forEach(card => {
+            // Add any dynamic vital sign analysis here
+        });
+    }
+
+    /**
+     * Update last updated timestamp
+     */
+    function updateTimestamp() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        document.getElementById('lastUpdated').textContent = timeString;
+    }
+
+    /**
+     * Show notification toast
+     */
+    function showNotification(message, type = 'info') {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        toast.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(toast);
+
+        // Remove after 5 seconds
+        setTimeout(() => {
+            toast.remove();
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}
